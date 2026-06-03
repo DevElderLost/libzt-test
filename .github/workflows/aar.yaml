@@ -40,4 +40,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: libzt-android-aar
-          path: bin/libzt.aar
+          path: "**/build/outputs/aar/*.aar"
