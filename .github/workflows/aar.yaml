@@ -23,6 +23,11 @@ jobs:
         with:
           ndk-version: '25.2.9519653'
 
+      - name: Install CMake and Build Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake make build-essential
+
       - name: Build
         run: |
           # Set lokasi Android Home dan NDK yang dibutuhkan skrip ZeroTier
@@ -44,3 +49,4 @@ jobs:
         with:
           name: libzt-android-aar
           path: "**/*.aar"
+          
