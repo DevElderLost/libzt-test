@@ -27,13 +27,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake make build-essential
+          
+          # Paksa buat link simbolik agar perintah 'cmake' bisa diakses dari mana saja secara global
+          sudo ln -sf /usr/bin/cmake /usr/local/bin/cmake
+          sudo ln -sf /usr/bin/make /usr/local/bin/make
 
       - name: Build
         run: |
           # Set lokasi Android Home dan NDK yang dibutuhkan skrip ZeroTier
           export ANDROID_HOME=$ANDROID_SDK_ROOT
           export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          
+          # Daftarkan /usr/local/bin ke urutan paling depan PATH sistem build
+          export PATH=/usr/local/bin:/usr/bin:/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           
           # Hapus paksa semua aturan -Werror di seluruh repositori
           find . -type f -exec sed -i 's/-Werror//g' {} +
