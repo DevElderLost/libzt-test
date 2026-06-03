@@ -34,11 +34,21 @@ jobs:
         run: |
           export ANDROID_HOME=$ANDROID_SDK_ROOT
           export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653
-          export PATH=/usr/local/bin:/usr/bin:/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           
+          # Langkah Kunci: Instal CMake versi 3.22.1 yang diminta oleh Gradle ke dalam Android SDK
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "cmake;3.22.1"
+          
+          # Daftarkan jalur CMake SDK ke PATH sistem
+          export PATH=$ANDROID_HOME/cmake/3.22.1/bin:/usr/local/bin:/usr/bin:/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          
+          # Hapus paksa semua aturan -Werror di seluruh file teks repositori
           find . -type f -exec sed -i 's/-Werror//g' {} +
+          
+          # Suntikkan perintah abaikan warning (-w) ke baris pertama setiap file CMakeLists.txt
+          find . -name "CMakeLists.txt" -exec sed -i 's/add_compile_options(-Werror)//g' {} +
           find . -name "CMakeLists.txt" -exec sed -i '1s/^/add_compile_options(-w)\n/' {} +
           
+          # Jalankan kompilasi resmi
           ./build.sh android-aar release
 
       - name: Upload AAR
