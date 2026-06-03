@@ -27,25 +27,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake make build-essential
-          
-          # Paksa buat link simbolik agar perintah 'cmake' bisa diakses dari mana saja secara global
           sudo ln -sf /usr/bin/cmake /usr/local/bin/cmake
           sudo ln -sf /usr/bin/make /usr/local/bin/make
 
-            - name: Build
+      - name: Build Code
         run: |
-          # Set lokasi Android Home dan NDK yang dibutuhkan skrip ZeroTier
           export ANDROID_HOME=$ANDROID_SDK_ROOT
           export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653
           export PATH=/usr/local/bin:/usr/bin:/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           
-          # Hapus paksa semua bendera -Werror di seluruh file teks repositori
           find . -type f -exec sed -i 's/-Werror//g' {} +
-          
-          # TRIK AMAN: Suntikkan perintah abaikan warning (-w) ke baris pertama setiap file CMakeLists.txt
           find . -name "CMakeLists.txt" -exec sed -i '1s/^/add_compile_options(-w)\n/' {} +
           
-          # Jalankan kompilasi resmi secara bersih (tanpa memodifikasi build.sh lagi)
           ./build.sh android-aar release
 
       - name: Upload AAR
@@ -53,3 +46,4 @@ jobs:
         with:
           name: libzt-android-aar
           path: "**/*.aar"
+          
