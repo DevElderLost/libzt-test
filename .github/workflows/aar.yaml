@@ -15,29 +15,32 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android NDK
+      - name: Setup Android SDK & NDK
         uses: android-actions/setup-android@v3
         with:
           ndk-version: '25.2.9519653'
 
       - name: Build
         run: |
-          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653
+          # Set lokasi Android Home dan NDK yang dibutuhkan skrip ZeroTier
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
+          export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           
-          # Hapus paksa semua bendera -Werror di seluruh repositori
+          # Hapus paksa semua aturan -Werror di seluruh repositori
           find . -type f -exec sed -i 's/-Werror//g' {} +
           
-          # Suntikkan instruksi pengabaian semua warning (-w) langsung ke dalam eksekusi cmake di build.sh
+          # Suntikkan pengabaian semua warning (-w) ke perintah cmake di build.sh
           sed -i 's/cmake /cmake -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w" /g' build.sh
           
-          # Jalankan kompilasi bersih
+          # Jalankan kompilasi resmi
           ./build.sh android-aar release
 
-          
-      - uses: actions/upload-artifact@v4
+      - name: Upload AAR
+        uses: actions/upload-artifact@v4
         with:
           name: libzt-android-aar
-          path: "**/build/outputs/aar/*.aar"
+          path: "**/*.aar"
