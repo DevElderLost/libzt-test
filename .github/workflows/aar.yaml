@@ -26,6 +26,10 @@ jobs:
       - name: Build
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653
+
+          export CFLAGS="-w"
+          export CXXFLAGS="-w"
+          
           ./build.sh android-aar release
 
       - uses: actions/upload-artifact@v4
