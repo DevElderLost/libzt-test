@@ -7,15 +7,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Checkout submodules
-      run: git submodule update --init
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
 
-    - name: Build
-      run: ./build.sh android-aar "release"
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
-    - uses: actions/upload-artifact@v2
-      with:
-        path: dist
+      - name: Setup Android NDK
+        uses: android-actions/setup-android@v3
+        with:
+          ndk-version: '25.2.9519653'
 
+      - name: Build
+        run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653
+          ./build.sh android-aar release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libzt-android-aar
+          path: bin/libzt.aar
