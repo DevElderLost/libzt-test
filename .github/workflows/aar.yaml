@@ -26,12 +26,15 @@ jobs:
       - name: Build
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653
-
-          export CFLAGS="-w"
-          export CXXFLAGS="-w"
           
+          # Hapus paksa semua aturan -Werror (Warning as Error) di file CMake bawaan libzt
+          find . -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} +
+          find . -name "*.cmake" -exec sed -i 's/-Werror//g' {} +
+          
+          # Jalankan kompilasi bersih
           ./build.sh android-aar release
 
+          
       - uses: actions/upload-artifact@v4
         with:
           name: libzt-android-aar
